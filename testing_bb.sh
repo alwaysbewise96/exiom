@@ -1,6 +1,6 @@
 #!/bin/bash
 
-base_dir="$HOME/project/Bounty101"
+base_dir="$HOME/.exiom"
 source "$base_dir/Interact/Includes/vars.sh"
 
 Main_menu(){
