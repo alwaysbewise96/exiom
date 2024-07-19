@@ -1,0 +1,11 @@
+{
+  "do_key": "dop_v1_9f2e61d10ab0a071acc9beae397673b49352ae137d6c1a560059962a88178860",
+  "region": "nyc1",
+  "provider": "do",
+  "default_size": "s-1vcpu-1gb",
+  "appliance_name": "",
+  "appliance_key": "",
+  "appliance_url": "",
+  "email": "",
+  "sshkey": "exiom_rsa"
+}

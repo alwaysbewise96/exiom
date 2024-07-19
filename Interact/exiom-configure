@@ -1,0 +1,166 @@
+#!/bin/bash
+base_dir="$HOME/.exiom"
+if [ -f "$base_dir/Interact/Includes/vars.sh" ] ; then
+source "$base_dir/Interact/Includes/vars.sh"
+fi
+
+cat << EOF
+
+
+▓█████ ▒██   ██▒ ██▓ ▒█████   ███▄ ▄███▓
+▓█   ▀ ▒▒ █ █ ▒░▓██▒▒██▒  ██▒▓██▒▀█▀ ██▒
+▒███   ░░  █   ░▒██▒▒██░  ██▒▓██    ▓██░
+▒▓█  ▄  ░ █ █ ▒ ░██░▒██   ██░▒██    ▒██ 
+░▒████▒▒██▒ ▒██▒░██░░ ████▓▒░▒██▒   ░██▒
+░░ ▒░ ░▒▒ ░ ░▓ ░░▓  ░ ▒░▒░▒░ ░ ▒░   ░  ░
+ ░ ░  ░░░   ░▒ ░ ▒ ░  ░ ▒ ▒░ ░  ░      ░
+   ░    ░    ░   ▒ ░░ ░ ░ ▒  ░      ░   
+   ░  ░ ░    ░   ░      ░ ░         ░   
+                                        
+
+The Dynamic Infrastructure Framework for Everybody - @pry0cc & @0xtavian
+
+We are lucky enough to be sponsored by the awesome SecurityTrails! 
+Sign up for your free account here! https://securitytrails.com/app/account?utm_source=axiom
+
+EOF
+
+###########################################################################################################
+# Help Menu
+# 
+function usage() {
+        echo -e "${BWhite}Description:"
+        echo -e "${BWhite}Examples:${Color_Off}"
+        echo -e "  ${Blue}configure${Color_Off} # kick off exiom configuration wizard"
+        echo -e "  ${Blue}configure --shell Zsh${Color_Off} # Set default shell to Zsh via command line"
+        echo -e "  ${Blue}configure --config <exiom.json config data>${Color_Off} # Use plaintext exiom.json data for account setup TODO: support .exiom.json as a file"
+        echo -e "  ${Blue}configure --shell BASH --unattended --config <exiom.json config data> ${Color_Off} # Use bash for default shell, do not promot, use plaintext .exiom.json data for account setup"
+        echo -e "${BWhite}Usage:${Color_Off}"
+        echo -e "  --config <exiom.json data>"
+        echo -e "    Setup account with data supplied from the command line (must be vaild data from exiom.json wrapped in single quotes)"
+        echo -e "  --unattended (optional)"
+        echo -e "    Avoid any promots, defaults to Oh My Zsh unless --shell argument is also provided"
+        echo -e "  --shell <Bash, Zsh, OMZ (Oh My Zsh)> (optional)"
+        echo -e "    Choose bash/zsh to add exiom to .bashrc/.zshrc. OMZ installs Oh My Zsh and overwrites .zshrc"
+        echo -e "  --help"
+        echo -e "    Display this help menu"
+}
+
+###########################################################################################################
+# Parse command line arguments 
+#
+i=0
+for arg in "$@"
+do
+    i=$((i+1))
+    if [[  ! " ${pass[@]} " =~ " ${i} " ]]; then
+        set=false
+        if [[ "$arg" == "--config" ]]; then
+            n=$((i+1))
+            config=$(echo ${!n})
+            config_flag="true"
+            set=true
+            pass+=($i)
+            pass+=($n)
+        fi
+        if [[ "$arg" == "--unattended" ]]; then
+            unattended=true          
+            set=true
+            pass+=($i)
+        fi
+        if [[ "$arg" == "--shell" ]]; then
+            n=$((i+1))
+            usershell=$(echo ${!n})
+            set=true
+            pass+=($i)
+            pass+=($n)
+        fi
+        if [[ "$arg" == "--help" ]] || [[ "$arg" == "-h" ]] || [[ "$arg" == "help" ]]; then
+            usage
+            exit
+            set=true
+            pass+=($i)
+        fi
+fi
+done
+
+if [ ! -z ${unattended:+x} ]; then
+echo -e "${Blue}Hello! Welcome to exiom configuration :)"
+echo -e "${Green}Detected unattended option passed from command line...${Color_Off}"
+echo -e "${Blue}Automatically installing dependencies and begining installation!${Color_Off}"
+if [ -z ${usershell:+x} ]; then
+usershell="omz"
+fi
+elif [ ! -z ${config+x} ]; then
+echo -e "${Blue}Hello! Welcome to exiom configuration :)"
+echo -e "${Green}Detected exiom.json option passed from command line...${Color_Off}"
+echo -e "${Blue}Automatically installing dependencies and begining installation!${Color_Off}"
+else
+echo -e "${Blue}Hello! Welcome to exiom configuration :)"
+echo -e "Press enter to install dependencies and begin installation!${Color_Off}"
+read
+echo -e "${Blue}INSTALLING exiom...${Color_Off}"
+sleep 1
+fi
+
+
+###########################################################################################################
+# Clone exiom repo
+
+# Check if base directory exists, clone if not
+if [ ! -d "$base_dir" ]; then
+    echo -e "${Blue}Installing exiom scripts...${Color_Off}"
+    git clone https://github.com/alwaysbewise96/exiom "$base_dir"
+else
+    cd "$base_dir" && git pull
+fi
+
+# Install anew if not already installed
+if ! command -v anew &> /dev/null; then
+    go install github.com/tomnomnom/anew@latest >> /dev/null 2>&1
+fi
+
+# Unattended setup flag logic
+if [ -z ${config+x} ]; then
+    if [[ "$unattended" == "true" ]]; then
+        echo "Unattended setup"
+        mkdir -p "$HOME/.exiom/accounts/"
+    else
+        # Default setup logic when --unattended and --config args are not used
+        mkdir -p "${HOME}/.exiom/tmp/"
+        "$base_dir/Setup/accounts/generate_amass.sh"
+        echo -e "${Blue}Configuring your cloud account...${Color_Off}"
+        "$base_dir/Interact/exiom-account-setup"
+    fi
+else
+    # Config parsing logic
+    echo "Parsing account.json file passed from command line"
+    provider="$(echo "$config" | jq -r '.provider')"
+    mkdir -p "$HOME/.exiom/accounts/"
+    account="${provider}$(date +%s)"
+    echo "$config" > "$HOME/.exiom/accounts/$account.json"
+    echo "$config" > "$HOME/.exiom/exiom.json"
+    echo -e "${Blue}Cloud account configuration passed from command line...${Color_Off}"
+fi
+
+export PATH="$PATH:$HOME/.exiom/Interact"
+
+if [[ $unattended == "true" ]]; then
+    echo -e "${BWhite}exiom install complete. Run account-setup to use exiom...${Color_Off}"
+    echo -e "${BWhite}You may need to restart your shell: $SHELL${Color_Off}"
+    if [[ $config_flag == "true" ]]; then
+        "$HOME/.exiom/Interact/exiom-account" "$account"
+    fi
+    exit 0
+fi
+
+if [ -z ${config+x} ]; then
+    echo -e "${BWhite}Beginning first packer build...${Color_Off}"
+    cd "$base_dir/" || exit
+    "$base_dir/Interact/exiom-build"
+    cd || exit
+    echo -e "${BWhite}You may need to restart your shell: $SHELL${Color_Off}"
+else
+    echo -e "${BWhite}You may need to restart your shell: $SHELL${Color_Off}"
+    "$HOME/.exiom/Interact/exiom-account" "$account"
+fi
