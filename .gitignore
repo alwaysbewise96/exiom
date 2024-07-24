@@ -14,5 +14,6 @@ tmp/*
 exiom.json
 images/exiom.json
 Interact/Includes/functions.sh
+Interact/Includes/new_color.sh
 selected.conf
 NOTE
