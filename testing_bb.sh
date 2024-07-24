@@ -1,7 +1,6 @@
 #!/bin/bash
 
-base_dir="$HOME/.exiom/"
-source "$base_dir/Interact/Includes/vars.sh"
+base_dir="$HOME/.exiom"
 cloud_install="$base_dir/Interact/exiom-configure"
 offline_install="$base_dir/testing_bb2.sh"
 
@@ -97,6 +96,19 @@ function omz_shell(){
 
 install_tools(){
 
+
+###########################################################################################################
+# Clone exiom repo
+
+# Check if base directory exists, clone if not
+if [ ! -d "$base_dir" ]; then
+    echo -e "${Blue}Installing exiom scripts...${Color_Off}"
+    git clone https://github.com/alwaysbewise96/exiom "$base_dir"
+else
+    cd "$base_dir" && git pull
+fi
+
+source "$base_dir/Interact/Includes/vars.sh"
 	
 echo -e "${BWhite}Installing deps! Please wait :) ${Color_Off}"
 BASEOS="$(uname)"
@@ -294,7 +306,7 @@ fi
 		echo -e "${check_mark} ${LightCyan}AWS CLI is already installed${Color_Off}"
 	else
 		echo -e "${BRed}AWS CLI is not installed. We are installing for you..${Color_Off}"
-		sudo python3 -m pip install awscli > /dev/null 2>&1
+		sudo python3 -m pip3 install awscli > /dev/null 2>&1
 		echo -e "${check_mark} ${LightCyan}AWS CLI is installed${Color_Off}"
 	fi
 
@@ -347,19 +359,15 @@ fi
     # Processing user choice
     if [[ $desire == "O" || $desire == "offline" ]]; then
         echo -e "${LightBlue}Initiating installation for offline tools only..${Color_Off}"
-        bash "$offline_install"
-        # Insert commands for offline installation here
+        bash "$offline_install" # commands for offline installation
     elif [[ $desire == "C" || $desire == "cloud" ]]; then
         echo -e "${LightBlue}Initiating installation into Cloud..${Color_Off}"
-        bash "$cloud_install"
-        # Insert commands for cloud deployment here
+        bash "$cloud_install" # commands for cloud deployment
     else
         echo -e "${LightBlue}Not a valid choice.${Color_Off}"
         echo -e "${LightBlue}Please input your desired choice (Offline for installer tools only or Deploy into cloud with Exiom [(O)ffline/(C)loud])${Color_Off}"
         read -p ">> " desire
     fi
-    #Continue Install if choose modules cloud or axiom
-	#bash "$running"
 
 }
 
