@@ -96,7 +96,6 @@ function omz_shell(){
 
 install_tools(){
 
-
 ###########################################################################################################
 # Clone exiom repo
 
@@ -306,7 +305,7 @@ fi
 		echo -e "${check_mark} ${LightCyan}AWS CLI is already installed${Color_Off}"
 	else
 		echo -e "${BRed}AWS CLI is not installed. We are installing for you..${Color_Off}"
-		sudo python3 -m pip3 install awscli > /dev/null 2>&1
+		sudo apt install awscli > /dev/null 2>&1
 		echo -e "${check_mark} ${LightCyan}AWS CLI is installed${Color_Off}"
 	fi
 
