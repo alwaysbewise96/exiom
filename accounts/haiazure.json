@@ -1,0 +1,15 @@
+{
+  "client_id": "1acb693b-d1b5-4ba9-8e4d-8d8b7cf653d2",
+  "client_secret": "E2u8Q~Zy5mrgSlL5jn15_~8pNGIFAiO0_NqSEadb",
+  "tenant_id": "94ea9f76-4599-40f4-a4de-623425ffb755",
+  "subscription_id": "0ebd6a88-ac78-4e91-82df-f2faffebe4bc",
+  "region": "eastus",
+  "resource_group": "exiom",
+  "provider": "azure",
+  "default_size": "Standard_B1ls",
+  "appliance_name": "",
+  "appliance_key": "",
+  "appliance_url": "",
+  "email": "",
+  "use_azure_cli_auth": "true"
+}

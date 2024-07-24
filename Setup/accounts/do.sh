@@ -2,6 +2,8 @@
 
 base_dir="$HOME/.exiom"
 source "$base_dir/Interact/Includes/vars.sh"
+restart_main="$base_dir/testing_bb.sh"
+
 
 appliance_name=""
 appliance_key=""
@@ -84,9 +86,9 @@ fi
             continue
         fi
 
-        invalid=$(doctl auth init -t "$token" 2>&1 | grep -vi "using token")
+        valid=$(doctl auth init -t "$token" 2>&1 | grep -vi "using token")
 
-        if [[ ! -z "$invalid" ]]; then
+        if [[ -z "$valid" ]]; then
             echo -e "${Green}Your token is valid."
             break  # Exit the loop if token is valid
         else
@@ -95,13 +97,15 @@ fi
 
             if [[ $attempts -ge $max_attempts ]]; then
                 echo -e "${BRed}Maximun attempts reached.${Color_Off}"
-                read -r -p "$(echo -e "${Green}Do you want to skip this process (yes/no)? : ${Color_Off}")" response
+                read -r -p "$(echo -e "${Green}Do you want to restart this process (yes/no)? : ${Color_Off}")" response
                 if [[ $response == "yes" ]]; then
-                    echo -e "${BGreen}Skipping this process..${Color_Off}"
-                    break
-                else
+                    #echo -e "${BGreen}Skipping this process..${Color_Off}"
+                    #dosetup
                     attempts=0 # Reset attempt counter
                     echo -e "${BGreen}Restarting token validation..${Color_Off}"
+                    
+                else
+                    $restart_main "show_menu"
                 fi
             fi
         fi

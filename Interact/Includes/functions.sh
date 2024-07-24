@@ -1,0 +1,1 @@
+/home/nothing/.exiom/providers//azure-functions.sh
