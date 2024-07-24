@@ -65,14 +65,16 @@ We are lucky enough to be sponsored by the awesome SecurityTrails! Sign up for y
 
 
 ## Operating Systems Supported
+----------------------------------------------------------
 | OS         | Supported | Easy Install  | Tested        | 
 |------------|-----------|---------------|---------------|
-| Ubuntu     |    Yes    | Yes           | Ubuntu 20.04  |
-| Kali       |    Yes    | Yes           | Kali 2021.3   |
-| Debian     |    Yes    | Yes           | Debian 10     |
-| Windows    |    Yes    | Yes           | WSL w/ Ubuntu |
-| MacOS      |    Yes    | Yes           | MacOS 11.6    |
-| Arch Linux |    Yes    | No            | Yes           |
+| Ubuntu     |    Yes    |      Yes      | Ubuntu 20.04  |
+| Kali       |    Yes    |      Yes      | Kali 2021.3   |
+| Debian     |    Yes    |      Yes      | Debian 10     |
+| Windows    |    Yes    |      Yes      | WSL w/ Ubuntu |
+| MacOS      |    Yes    |      Yes      | MacOS 11.6    |
+| Arch Linux |    Yes    |      No       | Yes           |
+----------------------------------------------------------
 
 
 
@@ -88,6 +90,7 @@ The awesome referral banners were inspired by [fleex](https://github.com/FleexSe
 
 # Tools to Date
 > for [default](https://github.com/pry0cc/axiom/blob/master/images/provisioners/default.json) provisioner
+
 <pre>
 - [x] aiodnsbrute&#9;&#9;- [x] ffuf&#9;&#9;&#9;&#9;- [x] gobuster&#9;&#9;&#9;- [x] massdns&#9;&#9;&#9;- [x] subfinder
 - [x] Amass&#9;&#9;&#9;- [x] findomain&#9;&#9;&#9;&#9;- [x] google-chrome&#9;&#9;- [x] medusa&#9;&#9;&#9;- [x] subjack
