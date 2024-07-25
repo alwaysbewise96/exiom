@@ -90,7 +90,52 @@ fi
 
         if [[ -z "$valid" ]]; then
             echo -e "${Green}Your token is valid."
-            break  # Exit the loop if token is valid
+            echo -e -n "${Green}Listing available regions with exiom-regions ls \n${Color_Off}"
+            doctl compute region list | grep -v false 
+
+            default_region=nyc1
+            echo -e -n "${Green}Please enter your default region: (Default '$default_region', press enter) \n>> ${Color_Off}"
+            read region
+                if [[ "$region" == "" ]]; then
+                echo -e "${Blue}Selected default option '$default_region'${Color_Off}"
+                region="$default_region"
+                fi
+                echo -e -n "${Green}Please enter your default size: (Default 's-1vcpu-1gb', press enter) \n>> ${Color_Off}"
+                read size
+                if [[ "$size" == "" ]]; then
+                echo -e "${Blue}Selected default option 's-1vcpu-1gb'${Color_Off}"
+                    size="s-1vcpu-1gb"
+            fi
+
+            echo -e -n "${Green}Please enter your GPG Recipient Email (for encryption of boxes): (optional, press enter) \n>> ${Color_Off}"
+            read email
+
+
+            data="$(echo "{\"do_key\":\"$token\",\"region\":\"$region\",\"provider\":\"do\",\"default_size\":\"$size\",\"appliance_name\":\"$appliance_name\",\"appliance_key\":\"$appliance_key\",\"appliance_url\":\"$appliance_url\", \"email\":\"$email\"}")"
+
+            echo -e "${BGreen}Profile settings below: ${Color_Off}"
+            echo $data | jq
+            echo -e "${BGray}Press enter if you want to save these to a new profile, type 'r' if you wish to start again.${Color_Off}"
+            read ans
+
+            if [[ "$ans" == "r" ]];
+            then
+                $0
+                exit
+            fi
+
+            echo -e -n "${BGray}Please enter your profile name (e.g 'personal', must be all lowercase/no specials)\n>> ${Color_Off}"
+            read title
+
+            if [[ "$title" == "" ]]; then
+                title="personal"
+                echo -e "${Blue}Named profile 'personal'${Color_Off}"
+            fi
+
+            echo $data | jq > "$base_dir/accounts/$title.json"
+            echo -e "${BGreen}Saved profile '$title' successfully!${Color_Off}"
+            $base_dir/Interact/exiom-account $title
+
         else
             echo -e "${BRed}Failed to authenticate with the provided token.${Color_Off}"
             ((attempts++))
@@ -103,61 +148,17 @@ fi
                     #dosetup
                     attempts=0 # Reset attempt counter
                     echo -e "${BGreen}Restarting token validation..${Color_Off}"
-                    
                 else
-                    $restart_main "show_menu"
+                    read -r -p "$(echo -e "${Green}Are you want to changes provider (yes/no) : ${Color_Off}")" ans
+                    if [[ $ans == "yes" ]];then
+                        bash "$base_dir/Interact/exiom-account-setup"
+                    else
+                        echo "Restarting Your account setup.."
+                        exit 0
+                    fi
                 fi
             fi
         fi
     done
-
-
-echo -e -n "${Green}Listing available regions with exiom-regions ls \n${Color_Off}"
-doctl compute region list | grep -v false 
-
-default_region=nyc1
-echo -e -n "${Green}Please enter your default region: (Default '$default_region', press enter) \n>> ${Color_Off}"
-read region
-	if [[ "$region" == "" ]]; then
-	echo -e "${Blue}Selected default option '$default_region'${Color_Off}"
-	region="$default_region"
-	fi
-	echo -e -n "${Green}Please enter your default size: (Default 's-1vcpu-1gb', press enter) \n>> ${Color_Off}"
-	read size
-	if [[ "$size" == "" ]]; then
-	echo -e "${Blue}Selected default option 's-1vcpu-1gb'${Color_Off}"
-        size="s-1vcpu-1gb"
-fi
-
-echo -e -n "${Green}Please enter your GPG Recipient Email (for encryption of boxes): (optional, press enter) \n>> ${Color_Off}"
-read email
-
-
-data="$(echo "{\"do_key\":\"$token\",\"region\":\"$region\",\"provider\":\"do\",\"default_size\":\"$size\",\"appliance_name\":\"$appliance_name\",\"appliance_key\":\"$appliance_key\",\"appliance_url\":\"$appliance_url\", \"email\":\"$email\"}")"
-
-echo -e "${BGreen}Profile settings below: ${Color_Off}"
-echo $data | jq
-echo -e "${BGray}Press enter if you want to save these to a new profile, type 'r' if you wish to start again.${Color_Off}"
-read ans
-
-if [[ "$ans" == "r" ]];
-then
-    $0
-    exit
-fi
-
-echo -e -n "${BGray}Please enter your profile name (e.g 'personal', must be all lowercase/no specials)\n>> ${Color_Off}"
-read title
-
-if [[ "$title" == "" ]]; then
-    title="personal"
-    echo -e "${Blue}Named profile 'personal'${Color_Off}"
-fi
-
-echo $data | jq > "$base_dir/accounts/$title.json"
-echo -e "${BGreen}Saved profile '$title' successfully!${Color_Off}"
-$base_dir/Interact/exiom-account $title
-
 }
-
 dosetup
