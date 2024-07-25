@@ -46,7 +46,7 @@ docker exec -it $(docker run -d -it --platform linux/amd64 ubuntu:20.04) sh -c "
 You should use an OS that supports our [easy install](https://github.com/alwyasbewise96/exiom#operating-systems-supported). <br>
 For Linux systems you will also need to install the newest versions of all packages beforehand `sudo apt dist-upgrade`. <br>
 ```
-bash <(curl -s https://raw.githubusercontent.com/alwyasbewise96/exiom/testing_bb.sh)
+bash <(curl -s https://raw.githubusercontent.com/alwaysbewise96/exiom/main/testing_bb.sh)
 ```
 
 If you have any problems with this installer, or if using an unsupported OS please refer to [Installation](https://github.com/alwyasbewise96/exiom/wiki/0-Installation).
@@ -77,7 +77,6 @@ We are lucky enough to be sponsored by the awesome SecurityTrails! Sign up for y
 ----------------------------------------------------------
 
 
-
 # Contributors
 We've had some really fantastic additions to axiom, great feedback through issues, and perseverence through our heavy beta phase!
 
@@ -90,7 +89,6 @@ The awesome referral banners were inspired by [fleex](https://github.com/FleexSe
 
 # Tools to Date
 > for [default](https://github.com/pry0cc/axiom/blob/master/images/provisioners/default.json) provisioner
-
 <pre>
 - [x] aiodnsbrute&#9;&#9;- [x] ffuf&#9;&#9;&#9;&#9;- [x] gobuster&#9;&#9;&#9;- [x] massdns&#9;&#9;&#9;- [x] subfinder
 - [x] Amass&#9;&#9;&#9;- [x] findomain&#9;&#9;&#9;&#9;- [x] google-chrome&#9;&#9;- [x] medusa&#9;&#9;&#9;- [x] subjack
