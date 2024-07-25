@@ -77,88 +77,120 @@ fi
     max_attempts=3
     attempts=0
 
-	while true; do
-        echo -e -n "${Green}Please enter your token (required): \n>> ${Color_Off}"
-        read token
 
-        if [[ "$token" == "" ]]; then
-            echo -e "${BRed}Please provide a token, your entry contained no input.${Color_Off}"
-            continue
-        fi
+#!/bin/bash
 
-        valid=$(doctl auth init -t "$token" 2>&1 | grep -vi "using token")
+attempts=0
+max_attempts=3
 
-        if [[ -z "$valid" ]]; then
-            echo -e "${Green}Your token is valid."
-            echo -e -n "${Green}Listing available regions with exiom-regions ls \n${Color_Off}"
-            doctl compute region list | grep -v false 
+while true; do
+    echo -e -n "${Green}Please enter your token (required):\n>> ${Color_Off}"
+    read -r token
 
-            default_region=nyc1
-            echo -e -n "${Green}Please enter your default region: (Default '$default_region', press enter) \n>> ${Color_Off}"
-            read region
-                if [[ "$region" == "" ]]; then
-                echo -e "${Blue}Selected default option '$default_region'${Color_Off}"
-                region="$default_region"
-                fi
-                echo -e -n "${Green}Please enter your default size: (Default 's-1vcpu-1gb', press enter) \n>> ${Color_Off}"
-                read size
-                if [[ "$size" == "" ]]; then
-                echo -e "${Blue}Selected default option 's-1vcpu-1gb'${Color_Off}"
-                    size="s-1vcpu-1gb"
-            fi
+    if [[ -z "$token" ]]; then
+        echo -e "${BRed}Please provide a token; your entry contained no input.${Color_Off}"
+        continue
+    fi
 
-            echo -e -n "${Green}Please enter your GPG Recipient Email (for encryption of boxes): (optional, press enter) \n>> ${Color_Off}"
-            read email
+    # Attempt to initialize with the provided token and capture output
+    valid=$(doctl auth init -t "$token" 2>&1)
 
+    # Check if there's an error indicating invalid token
+    if echo "$valid" | grep -qi "invalid token"; then
+        echo -e "${BRed}Failed to authenticate with the provided token $token.${Color_Off}"
+        ((attempts++))
 
-            data="$(echo "{\"do_key\":\"$token\",\"region\":\"$region\",\"provider\":\"do\",\"default_size\":\"$size\",\"appliance_name\":\"$appliance_name\",\"appliance_key\":\"$appliance_key\",\"appliance_url\":\"$appliance_url\", \"email\":\"$email\"}")"
-
-            echo -e "${BGreen}Profile settings below: ${Color_Off}"
-            echo $data | jq
-            echo -e "${BGray}Press enter if you want to save these to a new profile, type 'r' if you wish to start again.${Color_Off}"
-            read ans
-
-            if [[ "$ans" == "r" ]];
-            then
-                $0
-                exit
-            fi
-
-            echo -e -n "${BGray}Please enter your profile name (e.g 'personal', must be all lowercase/no specials)\n>> ${Color_Off}"
-            read title
-
-            if [[ "$title" == "" ]]; then
-                title="personal"
-                echo -e "${Blue}Named profile 'personal'${Color_Off}"
-            fi
-
-            echo $data | jq > "$base_dir/accounts/$title.json"
-            echo -e "${BGreen}Saved profile '$title' successfully!${Color_Off}"
-            $base_dir/Interact/exiom-account $title
-
-        else
-            echo -e "${BRed}Failed to authenticate with the provided token.${Color_Off}"
-            ((attempts++))
-
-            if [[ $attempts -ge $max_attempts ]]; then
-                echo -e "${BRed}Maximun attempts reached.${Color_Off}"
-                read -r -p "$(echo -e "${Green}Do you want to restart this process (yes/no)? : ${Color_Off}")" response
-                if [[ $response == "yes" ]]; then
-                    #echo -e "${BGreen}Skipping this process..${Color_Off}"
-                    #dosetup
-                    attempts=0 # Reset attempt counter
-                    echo -e "${BGreen}Restarting token validation..${Color_Off}"
+        if [[ $attempts -ge $max_attempts ]]; then
+            echo -e "${BRed}Maximum attempts reached.${Color_Off}"
+            read -r -p "$(echo -e "${Green}Do you want to restart this process (yes/no)? : ${Color_Off}")" response
+            if [[ $response == "yes" ]]; then
+                attempts=0  # Reset attempt counter
+                echo -e "${BGreen}Restarting token validation..${Color_Off}"
+                continue  # Restart the loop
+            else
+                read -r -p "$(echo -e "${Green}Do you want to change provider (yes/no)? : ${Color_Off}")" ans
+                if [[ $ans == "yes" ]]; then
+                    bash "$base_dir/Interact/exiom-account-setup"
                 else
-                    read -r -p "$(echo -e "${Green}Are you want to changes provider (yes/no) : ${Color_Off}")" ans
-                    if [[ $ans == "yes" ]];then
-                        bash "$base_dir/Interact/exiom-account-setup"
-                    else
-                        echo "Restarting Your account setup.."
-                        exit 0
-                    fi
+                    echo "Restarting your account setup.."
+                    dosetup
                 fi
+                break  # Exit the loop
             fi
         fi
-    done
+    elif echo "$valid" | grep -qi "OK"; then
+        echo -e "${Green}Your token is valid."
+        echo -e -n "${Green}Listing available regions with exiom-regions ls:\n${Color_Off}"
+        doctl compute region list | grep -v false 
+
+        default_region=nyc1
+        echo -e -n "${Green}Please enter your default region: (Default '$default_region', press enter)\n>> ${Color_Off}"
+        read -r region
+        if [[ -z "$region" ]]; then
+            echo -e "${Blue}Selected default option '$default_region'${Color_Off}"
+            region="$default_region"
+        fi
+
+        echo -e -n "${Green}Please enter your default size: (Default 's-1vcpu-1gb', press enter)\n>> ${Color_Off}"
+        read -r size
+        if [[ -z "$size" ]]; then
+            echo -e "${Blue}Selected default option 's-1vcpu-1gb'${Color_Off}"
+            size="s-1vcpu-1gb"
+        fi
+
+        echo -e -n "${Green}Please enter your GPG Recipient Email (for encryption of boxes): (optional, press enter)\n>> ${Color_Off}"
+        read -r email
+
+        data=$(echo "{\"do_key\":\"$token\",\"region\":\"$region\",\"provider\":\"do\",\"default_size\":\"$size\",\"appliance_name\":\"$appliance_name\",\"appliance_key\":\"$appliance_key\",\"appliance_url\":\"$appliance_url\", \"email\":\"$email\"}")
+
+        echo -e "${BGreen}Profile settings below:${Color_Off}"
+        echo "$data" | jq
+
+        echo -e "${BGray}Press enter if you want to save these to a new profile, type 'r' if you wish to start again.${Color_Off}"
+        read -r ans
+
+        if [[ "$ans" == "r" ]]; then
+            "$0"
+            exit
+        fi
+
+        echo -e -n "${BGray}Please enter your profile name (e.g 'personal', must be all lowercase/no specials)\n>> ${Color_Off}"
+        read -r title
+
+        if [[ -z "$title" ]]; then
+            title="personal"
+            echo -e "${Blue}Named profile 'personal'${Color_Off}"
+        fi
+
+        echo "$data" | jq > "$base_dir/accounts/$title.json"
+        echo -e "${BGreen}Saved profile '$title' successfully!${Color_Off}"
+        "$base_dir/Interact/exiom-account" "$title"
+        break
+    else
+        echo -e "${BRed}No valid token provided.${Color_Off}"
+        ((attempts++))
+
+        if [[ $attempts -ge $max_attempts ]]; then
+            echo -e "${BRed}Maximum attempts reached.${Color_Off}"
+            read -r -p "$(echo -e "${Green}Do you want to restart this process (yes/no)? : ${Color_Off}")" response
+            if [[ $response == "yes" ]]; then
+                attempts=0  # Reset attempt counter
+                echo -e "${BGreen}Restarting token validation..${Color_Off}"
+            else
+                read -r -p "$(echo -e "${Green}Do you want to change provider (yes/no)? : ${Color_Off}")" ans
+                if [[ $ans == "yes" ]]; then
+                    bash "$base_dir/Interact/exiom-account-setup"
+                else
+                    echo "Restarting your account setup.."
+                    dosetup
+                fi
+                break
+            fi
+        fi
+    fi
+done
+
+
 }
 dosetup
+
