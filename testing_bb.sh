@@ -30,7 +30,7 @@ show_menu(){
                 ;;
             4)
                 echo "Exiting..."
-                exit 0
+                return
                 ;;
             *)
                 echo "Invalid option. Please choose again!"
