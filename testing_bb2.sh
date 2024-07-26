@@ -34,7 +34,7 @@ assign_dir(){
             bash "$restart"
         else
             echo "Please check your typing again."
-            echo "Available inputs: Yes/Y/yes/y"
+            echo "Available inputs: Y/y"
         fi		
     else
         echo "Directory $Input_dir doesn't exist."
