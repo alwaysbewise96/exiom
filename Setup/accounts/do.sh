@@ -118,7 +118,8 @@ while true; do
                 break  # Exit the loop
             fi
         fi
-    elif echo "$valid" | grep -qi "OK"; then
+    else 
+        echo "$valid" | grep -qi "OK"
         echo -e "${Green}Your token is valid."
         echo -e -n "${Green}Listing available regions with exiom-regions ls:\n${Color_Off}"
         doctl compute region list | grep -v false 
@@ -166,30 +167,8 @@ while true; do
         echo -e "${BGreen}Saved profile '$title' successfully!${Color_Off}"
         "$base_dir/Interact/exiom-account" "$title"
         break
-    else
-        echo -e "${BRed}No valid token provided.${Color_Off}"
-        ((attempts++))
-
-        if [[ $attempts -ge $max_attempts ]]; then
-            echo -e "${BRed}Maximum attempts reached.${Color_Off}"
-            read -r -p "$(echo -e "${Green}Do you want to restart this process (yes/no)? : ${Color_Off}")" response
-            if [[ $response == "yes" ]]; then
-                attempts=0  # Reset attempt counter
-                echo -e "${BGreen}Restarting token validation..${Color_Off}"
-            else
-                read -r -p "$(echo -e "${Green}Do you want to change provider (yes/no)? : ${Color_Off}")" ans
-                if [[ $ans == "yes" ]]; then
-                    bash "$base_dir/Interact/exiom-account-setup"
-                else
-                    echo "Restarting your account setup.."
-                    dosetup
-                fi
-                break
-            fi
-        fi
     fi
 done
-
 
 }
 dosetup
