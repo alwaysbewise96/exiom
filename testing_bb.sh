@@ -48,7 +48,7 @@ function bash_shell(){
     echo -e "${Blue}Backing up $(echo "$HOME"/.bashrc) to $(echo "$HOME"/.bashrcbak) just in case.${Color_Off}"
     cp "$HOME"/.bashrc "$HOME"/.bashrcbak >> /dev/null 2>&1
     mkdir -p "${HOME}/go"
-    SHELL=$(which bash)
+        SHELL=$(which bash)
 
     configurations=(
     "export GOPATH=\$HOME/go"
@@ -349,10 +349,10 @@ fi
             echo -e "${BGreen}Done Extraxting Go into /usr/local. ${Color_Off}"
         else
             echo -e "${BGreen}Downloading Go..${Color_Off}"
-		wget https://go.dev/dl/go1.22.5.linux-amd64.tar.gz
-		sudo tar -C $pretools -xzf go1.22.5.linux-amd64.tar.gz && export GOROOT=$pretools-go && export PATH=$PATH:$GOROOT
-		echo -e "${check_mark} ${LightCyan}Go is installed.${Color_Off}"
-	fi
+		    wget https://go.dev/dl/go1.22.5.linux-amd64.tar.gz
+		    sudo tar -C $pretools -xzf go1.22.5.linux-amd64.tar.gz && export GOROOT=$pretools-go && export PATH=$PATH:$GOROOT
+		    echo -e "${check_mark} ${LightCyan}Go is installed.${Color_Off}"
+        fi
     fi
 
 	#doctl
@@ -364,7 +364,7 @@ fi
         tar xf ~/doctl-1.104.0-linux-amd64.tar.gz && sudo mv ~/doctl /usr/local/bin
 		echo -e "${check_mark} ${LightCyan}doctl is installed${Color_Off}"
 	fi
-	
+
     #openssh-server
 	if command -v sshd > /dev/null 2>&1; then
 		echo -e "${check_mark} ${LightCyan}openssh-server is already installed${Color_Off}"
