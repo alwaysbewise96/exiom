@@ -84,72 +84,72 @@ do
 fi
 done
 
-    if [ ! -z ${unattended:+x} ]; then
-        echo -e "${Blue}Hello! Welcome to exiom configuration :)"
-        echo -e "${Green}Detected unattended option passed from command line...${Color_Off}"
-        echo -e "${Blue}Automatically installing dependencies and begining installation!${Color_Off}"
-    if [ -z ${usershell:+x} ]; then
-        usershell="omz"
-    fi
-    elif [ ! -z ${config+x} ]; then
-        echo -e "${Blue}Hello! Welcome to exiom configuration :)"
-        echo -e "${Green}Detected exiom.json option passed from command line...${Color_Off}"
-        echo -e "${Blue}Automatically installing dependencies and begining installation!${Color_Off}"
-    else
-        echo -e "${Blue}Hello! Welcome to exiom configuration :)"
-        echo -e "Press enter to install dependencies and begin installation!${Color_Off}"
-        read
-        echo -e "${Blue}INSTALLING exiom...${Color_Off}"
-        sleep 1
-    fi
+if [ ! -z ${unattended:+x} ]; then
+echo -e "${Blue}Hello! Welcome to exiom configuration :)"
+echo -e "${Green}Detected unattended option passed from command line...${Color_Off}"
+echo -e "${Blue}Automatically installing dependencies and begining installation!${Color_Off}"
+if [ -z ${usershell:+x} ]; then
+usershell="omz"
+fi
+elif [ ! -z ${config+x} ]; then
+echo -e "${Blue}Hello! Welcome to exiom configuration :)"
+echo -e "${Green}Detected exiom.json option passed from command line...${Color_Off}"
+echo -e "${Blue}Automatically installing dependencies and begining installation!${Color_Off}"
+else
+echo -e "${Blue}Hello! Welcome to exiom configuration :)"
+echo -e "Press enter to install dependencies and begin installation!${Color_Off}"
+read
+echo -e "${Blue}INSTALLING exiom...${Color_Off}"
+sleep 1
+fi
 
 
-    # Install anew if not already installed
-    if ! command -v anew &> /dev/null; then
-        go install github.com/tomnomnom/anew@latest >> /dev/null 2>&1
-    fi
+# Install anew if not already installed
+if ! command -v anew &> /dev/null; then
+    go install github.com/tomnomnom/anew@latest >> /dev/null 2>&1
+fi
 
-    # Unattended setup flag logic
-    if [ -z ${config+x} ]; then
-        if [[ "$unattended" == "true" ]]; then
-            echo "Unattended setup"
-            mkdir -p "$HOME/.exiom/accounts/"
-        else
-            # Default setup logic when --unattended and --config args are not used
-            mkdir -p "${HOME}/.exiom/tmp/"
-            "$base_dir/Setup/accounts/generate_amass.sh"
-            echo -e "${Blue}Configuring your cloud account...${Color_Off}"
-            "$base_dir/Interact/exiom-account-setup"
-        fi
-    else
-        # Config parsing logic
-        echo "Parsing account.json file passed from command line"
-        provider="$(echo "$config" | jq -r '.provider')"
+# Unattended setup flag logic
+if [ -z ${config+x} ]; then
+    if [[ "$unattended" == "true" ]]; then
+        echo "Unattended setup"
         mkdir -p "$HOME/.exiom/accounts/"
-        account="${provider}$(date +%s)"
-        echo "$config" > "$HOME/.exiom/accounts/$account.json"
-        echo "$config" > "$HOME/.exiom/exiom.json"
-        echo -e "${Blue}Cloud account configuration passed from command line...${Color_Off}"
-    fi
-
-    export PATH="$PATH:$HOME/.exiom/Interact"
-
-    if [[ $unattended == "true" ]]; then
-        echo -e "${BWhite}exiom install complete. Run account-setup to use exiom...${Color_Off}"
-        echo -e "${BWhite}You may need to restart your shell: $SHELL${Color_Off}"
-        if [[ $config_flag == "true" ]]; then
-            "$HOME/.exiom/Interact/exiom-account" "$account"
-        fi
-        exit 0
-    fi
-
-    if [ -z ${config+x} ]; then
-        echo -e "${BWhite}Beginning first packer build...${Color_Off}"
-        cd "$base_dir/" || exit
-        "$base_dir/Interact/exiom-build"
-        cd || exit
-        echo -e "${BWhite}You may need to restart your shell: $SHELL${Color_Off}"
     else
-        echo -e "${BWhite}You may need to restart your shell: $SHELL${Color_Off}"
+        # Default setup logic when --unattended and --config args are not used
+        mkdir -p "${HOME}/.exiom/tmp/"
+        "$base_dir/Setup/accounts/generate_amass.sh"
+        echo -e "${Blue}Configuring your cloud account...${Color_Off}"
+        "$base_dir/Interact/exiom-account-setup"
+    fi
+else
+    # Config parsing logic
+    echo "Parsing account.json file passed from command line"
+    provider="$(echo "$config" | jq -r '.provider')"
+    mkdir -p "$HOME/.exiom/accounts/"
+    account="${provider}$(date +%s)"
+    echo "$config" > "$HOME/.exiom/accounts/$account.json"
+    echo "$config" > "$HOME/.exiom/exiom.json"
+    echo -e "${Blue}Cloud account configuration passed from command line...${Color_Off}"
+fi
+
+export PATH="$PATH:$HOME/.exiom/Interact"
+
+if [[ $unattended == "true" ]]; then
+    echo -e "${BWhite}exiom install complete. Run account-setup to use exiom...${Color_Off}"
+    echo -e "${BWhite}You may need to restart your shell: $SHELL${Color_Off}"
+    if [[ $config_flag == "true" ]]; then
         "$HOME/.exiom/Interact/exiom-account" "$account"
     fi
+    exit 0
+fi
+
+if [ -z ${config+x} ]; then
+    echo -e "${BWhite}Beginning first packer build...${Color_Off}"
+    cd "$base_dir/" || exit
+    "$base_dir/Interact/exiom-build"
+    cd || exit
+    echo -e "${BWhite}You may need to restart your shell: $SHELL${Color_Off}"
+else
+    echo -e "${BWhite}You may need to restart your shell: $SHELL${Color_Off}"
+    "$HOME/.exiom/Interact/exiom-account" "$account"
+fi

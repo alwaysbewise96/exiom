@@ -4,9 +4,9 @@ base_dir="$HOME/.exiom"
 source "$base_dir/Interact/Includes/vars.sh"
 
 
-echo -e "${BWhite}exiom Account Setup${Color_Off}"
+echo -e "${BWhite}EXIOM Account Setup${Color_Off}"
 echo -e "${Blue}You can use this wizard to add new accounts, once made, use exiom-account to switch between profiles${Color_Off}"
-account_helpers=$(find "$base_dir/Setup/accounts/" -name "*.sh" ! -name '*gcp*' ! -name "generate*" -execdir basename -s '.sh' {} +)
+account_helpers=$(find "$base_dir/Setup/accounts/" -name "*.sh" ! -name "*gcp" ! -name "generate*" -execdir basename -s '.sh' {} \;)
 account_str=$(echo $account_helpers | sed 's/ /, /g')
 echo -e -n "${Yellow}Please enter your provider ($account_str): \n>> "
 read provider

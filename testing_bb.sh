@@ -1,8 +1,8 @@
 #!/bin/bash
 
 base_dir="$HOME/.exiom"
-cloud_install="$base_dir/Interact/exiom-configure"
-offline_install="$base_dir/testing_bb2.sh"
+config_install="$base_dir/Interact/exiom-configure"
+
 
 Main_menu(){
     echo "1. Installation Tools"
@@ -48,32 +48,69 @@ function bash_shell(){
     echo -e "${Blue}Backing up $(echo "$HOME"/.bashrc) to $(echo "$HOME"/.bashrcbak) just in case.${Color_Off}"
     cp "$HOME"/.bashrc "$HOME"/.bashrcbak >> /dev/null 2>&1
     mkdir -p "${HOME}/go"
-    export GOPATH=$HOME/go
-    export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
-    echo "export GOPATH=\$HOME/go" >> "${HOME}"/.bashrc
-    echo "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH:\$HOME/.local/bin" >> "${HOME}"/.bashrc
-    source "${HOME}"/.bashrc
     SHELL=$(which bash)
+
+    configurations=(
+    "export GOPATH=\$HOME/go"
+    "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH"
+    "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH:\$HOME/.local/bin"
+    "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH"
+    "export PATH=\"\$PATH:\$HOME/dev/.exiom/Interact\""
+    )
+    # Check if the shell is ZSH
+    if [ "$SHELL" = *"/usr/bin/bash" ]; then
     echo -e "${Green}You're running Bash! Installing exiom to \$PATH...${Color_Off}"
-    echo "export PATH=\"\$PATH:\$HOME/.exiom/Interact\"" >>~/.bashrc
-    echo "[[ -f ~/.bashrc ]] && . ~/.bashrc" >> "${HOME}"/.bash_profile
-    source ~/.bashrc  >> /dev/null 2>&1
+
+        # Append each configuration to ~/.zshrc
+        for config in "${configurations[@]}"; do
+            # Check if the line already exists in ~/.zshrc
+            if ! grep -Fxq "$config" ~/.bashrc; then
+                echo "$config" >> ~/.bashrc
+            fi
+        done
+
+        # Source the .zshrc file to apply changes
+        source ~/.bashrc 
+    else
+        echo "This script is intended for Bash shell only."
+    fi
 }
 
 function zsh_shell(){
+
     sudo apt install zsh -y
     echo -e "${Blue}Backing up $(echo "$HOME"/.zshrc) to $(echo "$HOME"/.zshrcbak) just in case.${Color_Off}"
     cp "$HOME"/.zshrc "$HOME"/.zshrcbak >> /dev/null 2>&1
     mkdir -p "${HOME}/go"
-    export GOPATH=$HOME/go
-    export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
-    echo "export GOPATH=\$HOME/go" >>~/.zshrc
-    echo "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH:\$HOME/.local/bin"  >>~/.zshrc
-    echo -e "${Green}You're running ZSH! Installing exiom to \$PATH...${Color_Off}"
-    echo "export PATH=\"\$PATH:\$HOME/.exiom/Interact\"" >>~/.zshrc  
-    echo "source $HOME/.exiom/functions/autocomplete.zsh" >>~/.zshrc 
-    source "${HOME}"/.zshrc >> /dev/null 2>&1
     SHELL=$(which zsh)
+
+    # Define the paths and configurations to add
+configurations=(
+    "export GOPATH=\$HOME/go"
+    "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH"
+    "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH:\$HOME/.local/bin"
+    "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH"
+    "export PATH=\"\$PATH:\$HOME/dev/.exiom/Interact\""
+    "source \$HOME/dev/.exiom/functions/autocomplete.zsh"
+    )
+
+    # Check if the shell is ZSH
+    if [ "$SHELL" = *"/usr/bin/zsh" ]; then
+        echo -e "${Green}You're running ZSH! Installing exiom to \$PATH...${Color_Off}"
+
+        # Append each configuration to ~/.zshrc
+        for config in "${configurations[@]}"; do
+            # Check if the line already exists in ~/.zshrc
+            if ! grep -Fxq "$config" ~/.zshrc; then
+                echo "$config" >> ~/.zshrc
+            fi
+        done
+
+        # Source the .zshrc file to apply changes
+        source ~/.zshrc 
+    else
+        echo "This script is intended for ZSH shell only."
+    fi
 }
 
 function omz_shell(){
@@ -82,16 +119,36 @@ function omz_shell(){
     sudo apt install zsh zsh-syntax-highlighting zsh-autosuggestions -y
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     mkdir -p "${HOME}/go"
-    export GOPATH=$HOME/go
-    export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
-    echo "export GOPATH=\$HOME/go" >>~/.zshrc
-    echo "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH:\$HOME/.local/bin"  >>~/.zshrc
-    echo "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH" >>~/.zshrc
-    echo -e "${Green}You're running ZSH! Installing exiom to \$PATH...${Color_Off}"
-    echo "export PATH=\"\$PATH:\$HOME/.exiom/Interact\"" >>~/.zshrc  
-    echo "source $HOME/.exiom/functions/autocomplete.zsh" >>~/.zshrc   
-    source "${HOME}"/.zshrc  >> /dev/null 2>&1
     SHELL=$(which zsh)
+
+    # Define the paths and configurations to add
+configurations=(
+    "export GOPATH=\$HOME/go"
+    "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH"
+    "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH:\$HOME/.local/bin"
+    "export PATH=\$GOPATH/bin:/usr/local/go/bin:\$PATH"
+    "export PATH=\"\$PATH:\$HOME/dev/.exiom/Interact\""
+    "source \$HOME/dev/.exiom/functions/autocomplete.zsh"
+    )
+
+    # Check if the shell is ZSH
+    if [ "$SHELL" = *"/usr/bin/zsh" ]; then
+        echo -e "${Green}You're running ZSH! Installing exiom to \$PATH...${Color_Off}"
+
+        # Append each configuration to ~/.zshrc
+        for config in "${configurations[@]}"; do
+            # Check if the line already exists in ~/.zshrc
+            if ! grep -Fxq "$config" ~/.zshrc; then
+                echo "$config" >> ~/.zshrc
+            fi
+        done
+
+        # Source the .zshrc file to apply changes
+        source ~/.zshrc 
+    else
+        echo "This script is intended for ZSH shell only."
+    fi
+
 }
 
 install_tools(){
@@ -256,7 +313,7 @@ fi
 	
 	#Check first before install tools below
 	
-	pretools_go="/usr/local/go/bin/" #var for Go prerequiresites tools
+	pretools_go="/usr/local" #var for Go prerequiresites tools
 	pretools="/usr/local/bin/" #var for prerequiresites tools
 	echo -e "${LightBlue}This Requirement tools directory : $pretools" 	
 
@@ -275,7 +332,7 @@ fi
 		echo -e "${check_mark} ${LightCyan}jq already installed${Color_Off}"
 	else
 		echo -e "${BRed}jq is not installed. We are installing for you..${Color_Off}"
-		sudo apt install jq
+		sudo apt install jq -y
 		echo -e "${check_mark} ${LightCyan}jq is installed.${Color_Off}"
 	fi
 	
@@ -286,18 +343,35 @@ fi
 	else
 		echo -e "${BRed}Go is not installed. We are installing for you..${Color_Off}"
 		# Continue where you left off
+        if find . -type f -name "go1.22.5.linux*"; then
+            echo -e "${BGreen}Go tarball found. Extracting...${Color_Off}"
+            sudo tar -C /usr/local -xzf go1.22.5.*
+            echo -e "${BGreen}Done Extraxting Go into /usr/local. ${Color_Off}"
+        else
+            echo -e "${BGreen}Downloading Go..${Color_Off}"
 		wget https://go.dev/dl/go1.22.5.linux-amd64.tar.gz
 		sudo tar -C $pretools -xzf go1.22.5.linux-amd64.tar.gz && export GOROOT=$pretools-go && export PATH=$PATH:$GOROOT
 		echo -e "${check_mark} ${LightCyan}Go is installed.${Color_Off}"
 	fi
+    fi
 
 	#doctl
 	if command -v doctl > /dev/null 2>&1; then
 		echo -e "${check_mark} ${LightCyan}doctl already installed${Color_Off}"
 	else
 		echo -e "${BRed}doctl is not installed. We are installing for you..${Color_Off}"
-		sudo apt install doctl > /dev/null 2>&1
+		cd ~ && wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
+        tar xf ~/doctl-1.104.0-linux-amd64.tar.gz && sudo mv ~/doctl /usr/local/bin
 		echo -e "${check_mark} ${LightCyan}doctl is installed${Color_Off}"
+	fi
+	
+    #openssh-server
+	if command -v sshd > /dev/null 2>&1; then
+		echo -e "${check_mark} ${LightCyan}openssh-server is already installed${Color_Off}"
+	else
+		echo -e "${BRed}openssh-server CLI is not installed. We are installing for you..${Color_Off}"
+		sudo apt install openssh-server -y > /dev/null 2>&1
+		echo -e "${check_mark} ${LightCyan}openssh-server CLI is installed${Color_Off}"
 	fi
 	
 	#awscli
@@ -305,7 +379,7 @@ fi
 		echo -e "${check_mark} ${LightCyan}AWS CLI is already installed${Color_Off}"
 	else
 		echo -e "${BRed}AWS CLI is not installed. We are installing for you..${Color_Off}"
-		sudo apt install awscli > /dev/null 2>&1
+		sudo apt install awscli -y > /dev/null 2>&1
 		echo -e "${check_mark} ${LightCyan}AWS CLI is installed${Color_Off}"
 	fi
 
@@ -314,7 +388,7 @@ fi
 		echo -e "${check_mark} ${LightCyan}Linode CLI is already installed${Color_Off}"
 	else
 		echo -e "${BRed}Linode CLI is not installed. We are installing for you..${Color_Off}"
-		sudo pip3 install linode-cli > /dev/null 2>&1
+		pip3 install linode-cli > /dev/null 2>&1
 		echo -e "${check_mark} ${LightCyan}Linode CLI is installed${Color_Off}"
 	fi
 
@@ -323,7 +397,7 @@ fi
 		echo -e "${check_mark} ${LightCyan}Packer is already installed${Color_Off}"
 	else
         echo -e "${BRed}Packer is not installed. Installing packer...${Color_Off}"
-        wget -q -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.1/packer_1.8.1_linux_amd64.zip && cd /tmp/ && unzip packer.zip && sudo mv packer /usr/bin/ && rm /tmp/packer.zip
+        sudo apt install unzip -y && wget -q -O /tmp/packer.zip https://releases.hashicorp.com/packer/1.8.1/packer_1.8.1_linux_amd64.zip && cd /tmp/ && unzip packer.zip && sudo mv packer /usr/bin/ && rm /tmp/packer.zip
 		echo -e "${check_mark} ${LightCyan}Packer is installed${Color_Off}"
 	fi 
 
@@ -334,6 +408,7 @@ fi
 	else
         echo -e "${BRed}Interlace is not installed. Installing Interlace...${Color_Off}"
         sudo rm -fr /tmp/interlace
+        sudo apt install python3-pip -y && pip3 install setuptools -y
         git clone https://github.com/codingo/Interlace.git /tmp/interlace
         cd /tmp/interlace && sudo python3 setup.py install
 		echo -e "${check_mark} ${LightCyan}Interlace is installed${Color_Off}"
@@ -361,7 +436,7 @@ fi
         bash "$offline_install" # commands for offline installation
     elif [[ $desire == "C" || $desire == "cloud" ]]; then
         echo -e "${LightBlue}Initiating installation into Cloud..${Color_Off}"
-        bash "$cloud_install" # commands for cloud deployment
+        bash "$config_install" # commands for cloud deployment
     else
         echo -e "${LightBlue}Not a valid choice.${Color_Off}"
         echo -e "${LightBlue}Please input your desired choice (Offline for installer tools only or Deploy into cloud with Exiom [(O)ffline/(C)loud])${Color_Off}"

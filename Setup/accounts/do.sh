@@ -76,21 +76,15 @@ if [[ "$acc" == "n" ]]; then
 fi
     max_attempts=3
     attempts=0
-
-
-#!/bin/bash
-
-attempts=0
-max_attempts=3
-
+    
 while true; do
-    echo -e -n "${Green}Please enter your token (required):\n>> ${Color_Off}"
-    read -r token
+        echo -e -n "${Green}Please enter your token (required): \n>> ${Color_Off}"
+        read -r token
 
-    if [[ -z "$token" ]]; then
-        echo -e "${BRed}Please provide a token; your entry contained no input.${Color_Off}"
-        continue
-    fi
+        if [[ -z "$token" ]]; then
+            echo -e "${BRed}Please provide a token, your entry contained no input.${Color_Off}"
+            continue
+        fi
 
     # Attempt to initialize with the provided token and capture output
     valid=$(doctl auth init -t "$token" 2>&1)
@@ -172,4 +166,3 @@ done
 
 }
 dosetup
-

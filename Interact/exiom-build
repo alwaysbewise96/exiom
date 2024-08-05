@@ -29,9 +29,13 @@ if [ -z "$provisioner" ]; then
     echo -e "${Green}ReconFTW: includes all tools in ReconFTW and works with most modules. Recommended for ReconFTW.${Color_Off}"
     echo -e "${Yellow}Barebones: a decently secure base install, comes with Docker, Go-lang, Interlace and nmap installed. Recommended for templating.${Color_Off}"
     echo -e "${Green}Custom: custom Packer JSON you provide.${Color_Off}"
-    echo -e -n "${Blue}Which exiom provisioner would you like to use: default, reconftw, barebones, custom? (option: press enter to select Default) \n>>${Color_Off}"
+    echo -e -n "${Blue}Which exiom provisioner would you like to use: offline, default, reconftw, barebones, custom? (option: press enter to select Default) \n>>${Color_Off}"
 
     read ans
+    if [[ $ans == "offline" ]] || [[ $ans == "Offline" ]]; then
+               echo -e "${Green}Selected provisioner option 'Offline'${Color_Off}"
+               provisioner="offline"
+    fi
     if [[ $ans == "default" ]] || [[ $ans == "Default" ]]; then 
               echo -e "${Green}Selected provisioner option 'Default'${Color_Off}"
               provisioner="default"
@@ -179,7 +183,7 @@ fi
 # Execute the Packer binary to build the final image
 #
 counter=0
-echo -e "${BWhite}Building image $provisioner for provider $builder... This can take up to 25 minutes so please be patient!\nIf this fails, verify the account is properly configured and/or try a different region.${Color_Off}"
+echo -e "${BWhite}Building image ${BGreen}$provisioner${Color_Off} for provider ${BGreen}$builder${Color_Off}... This can take up to 25 minutes so please be patient!\nIf this fails, verify the account is properly configured and/or try a different region.${Color_Off}"
 
 if [[ $provisioner == "azure" ]]; then
     cp $base_dir/exiom.json $base_dir/exiom_bck.json
