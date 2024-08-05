@@ -1,4 +1,7 @@
 {
+  "variables": {
+    "base_dir": "{{ env `HOME` }}/.exiom"
+  },
     "builders": [],
     "provisioners": [
       {
@@ -327,7 +330,7 @@
       },
       {
         "type": "file",
-        "source": "$HOME/.exiom/configs",
+        "source": "{{ user `base_dir` }}/configs",
         "destination":"/tmp/configs"
       }
     ]
