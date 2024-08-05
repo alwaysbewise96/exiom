@@ -4,7 +4,7 @@
       {
         "type": "shell-local",
         "inline": [
-          "{{ env `HOME` }}/.exiom",
+          "export BASE_DIR=$HOME/.exiom",
 
           
           "sudo fallocate -l 2G /swap && sudo $pw chmod 600 /swap && sudo $pw mkswap /swap && sudo $pw swapon /swap",
@@ -327,7 +327,7 @@
       },
       {
         "type": "file",
-        "source": "{{ user `base_dir` }}/configs",
+        "source": "$HOME/.exiom/configs",
         "destination":"/tmp/configs"
       }
     ]
