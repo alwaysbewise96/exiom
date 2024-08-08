@@ -7,7 +7,7 @@ accounts/*.json
 selected.conf
 .DS_store
 *.swp
-config/authorized_keys
+configs/authorized_keys
 boxes/*
 archive/*
 tmp/*
