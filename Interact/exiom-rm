@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+base_dir="$HOME/.exiom"
+source "$base_dir/Interact/Includes/vars.sh"
+source "$base_dir/Interact/Includes/functions.sh"
+provider="$(jq -r .provider "$base_dir/exiom.json")"
+output="${Red}No instance supplied, use '\*' if you want to delete all instances"
+
+if [ -z "$1" ]
+then
+    if [ "$provider" != "linode" ] 
+    then
+        output="$output, use -f to force delete and avoid confirmation prompts{Color_Off}"
+    fi
+	echo -e "$output"
+    exit
+fi
+
+force="false"
+query=""
+droplets="$(instances)"
+selected=""
+
+for var in "$@"; do
+	if [ "$var" == "-f" ]; then
+		force=true
+	else
+		query="$query $var"
+	fi
+done
+
+selected=$(query_instances $query)
+
+if [[ "$selected" ]]
+then
+	for instance in $selected
+	do
+	    echo -e "${Red}Deleting '$instance'...${Color_Off}"
+		delete_instance "$instance" "$force"
+	done
+else    
+        >&2 echo -e "$output ${Color_Off}"
+	exit
+fi

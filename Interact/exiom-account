@@ -1,0 +1,57 @@
+#!/bin/bash
+
+base_dir="$HOME/.exiom"
+source "$base_dir/Interact/Includes/vars.sh"
+
+
+accounts=$(ls -A1 "$base_dir/accounts/" | grep ".json" | sed 's/\.json//g')
+if [ -f ~/.exiom/exiom.json ] ; then
+    current=$(ls -lh "$base_dir/exiom.json" | awk '{ print $11 }' | tr '/' '\n' | grep json | sed 's/\.json//g') > /dev/null 2>&1
+fi
+
+function bootstrap() {
+    account_helpers=$(find "$base_dir/Setup/accounts/" -name '*.sh' ! -name 'generate*' -execdir basename -s '.sh' {} +)
+    account_str=$(echo "$account_helpers" | sed 's/ /, /g')
+    provider_path="$base_dir/Setup/accounts/$provider.sh"
+    bash "$provider_path" 
+}
+
+if [ ! -z "$1" ]
+then
+    path="$base_dir/accounts/$1.json"
+    if [[ -f "$path" ]]
+    then
+        echo -e "${LightCyan}[INFO]${Color_Off} ${BYellow}Selecting $1...${Color_Off}"
+        rm "$base_dir/exiom.json" > /dev/null 2>&1
+        ln -s "$base_dir/accounts/$1.json" "$base_dir/exiom.json"
+        provider="$(cat "$base_dir/exiom.json" | jq -r '.provider')"
+        "$base_dir"/Interact/exiom-provider "$provider"
+
+        # If Azure cli isnt logged in, kick off bootstrap
+        # TODO: Make sure az is up to date
+        # TODO: This likely doesnt play well with multiple account accounts
+        # TODO: grep account creds from account.json and authenticate with those 
+        #
+        if [[ "$provider" == "azure" ]]; 
+            then    
+            az ad signed-in-user show || bootstrap
+        fi
+
+    echo -e "${LightCyan}[INFO]${Color_Off} ${BYellow}Selected $1 successfully${Color_Off}"
+    else
+        echo -e "${Red}Account name not present${Color_Off}"
+    fi #if path
+else
+    echo -e "${BWhite}Available Accounts${Color_Off}"
+    echo -n -e "${Blue}"
+    for account in $accounts
+        do
+            if [[ $account == $current ]]
+            then
+                echo "* $account"
+            else
+                echo "  $account"
+            fi
+        done
+    echo -n -e "${Color_Off}"
+fi #main if

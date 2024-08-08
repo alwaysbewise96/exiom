@@ -1,0 +1,40 @@
+#!/bin/bash
+
+base_dir="$HOME/.exiom"
+if [ -f "$base_dir/Interact/Includes/vars.sh" ] ; then
+source "$base_dir/Interact/Includes/vars.sh"
+fi
+if [ -f "$base_dir/Interact/Includes/functions.sh" ] ; then
+source "$base_dir/Interact/Includes/functions.sh"
+fi
+
+INCLUDE_PATH="$base_dir/providers/"
+SRC_FUNCTIONS="$base_dir/Interact/Includes/functions.sh"
+provisioner="$(jq -r '.provisioner' "$base_dir"/exiom.json)"
+
+options=$(ls -l "$INCLUDE_PATH" | grep "\-functions.sh" | awk '{ print $9 }' | sed 's/\-functions\.sh//g')
+choice=false
+
+if [ ! -z $1 ]
+then
+	choice="$1"
+fi
+
+if [[ "$choice" != "false" ]]
+then
+	CHOICE_FUNCTIONS="$INCLUDE_PATH/$choice-functions.sh"
+
+	if [ -f "$CHOICE_FUNCTIONS" ]
+	then
+		echo -e "${LightCyan}[INFO]${Color_Off} ${BYellow}Setting exiom provider to '$choice'${Color_Off}"
+		"$base_dir/Interact/generate_packer" "$choice" "$provisioner" > /dev/null 2>&1
+
+                if [ -f "$SRC_FUNCTIONS" ] ; then
+					rm "$SRC_FUNCTIONS"
+                fi
+		ln -s "$CHOICE_FUNCTIONS" "$SRC_FUNCTIONS"
+		echo -e "${check_mark} ${LightCyan}Provider set successfully${Color_Off}"
+	fi
+else
+	echo $options | tr ' ' '\n'
+fi

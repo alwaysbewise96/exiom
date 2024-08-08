@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+base_dir="$HOME/.exiom"
+source "$base_dir/Interact/Includes/vars.sh"
+source "$base_dir/Interact/Includes/functions.sh"
+source "$base_dir/Interact/Includes/appliance.sh"
+current=$(ls -lh ~/.exiom/exiom.json | awk '{ print $11 }' | tr '/' '\n' | grep json | sed 's/\.json//g') > /dev/null 2>&1
+
+echo -e "Listing instances in account: $(echo $current)" | perl -pe '$_ = "\033[0;37m$_\033[0;34m" if($. % 2)'
+if [ -z $1 ]; then
+	instance_pretty
+else
+	if [[ "$1" == "--json" ]]; then
+		instances
+	elif [[ "$1" == "--list" ]]; then
+		instance_list
+	elif [[ "$1" == "--appliance" ]]; then
+		pretty_appliances
+	else
+		resp=$(query_instances "$1")
+		count=$(echo $resp | tr ' ' '\n' | wc -l | awk '{ print $1 }')
+
+		if [[ "$count" -gt 1 ]]; then
+			i=1
+			for name in $resp; do
+				echo "$i:$name"
+				i=$((i + 1))
+			done
+		else
+			instance_ip "$1"
+		fi
+	fi
+fi
