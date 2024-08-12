@@ -47,22 +47,6 @@
           "sudo systemctl restart ssh'",
           "chmod +x /etc/update-motd.d/00-header",
 
-          "echo 'Installing Golang 1.22.2'",
-          "sudo /bin/su -l op -c 'wget -q https://golang.org/dl/go1.22.2.linux-amd64.tar.gz && sudo tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz && rm go1.22.2.linux-amd64.tar.gz'",
-          "sudo /bin/su -l op -c 'export GOPATH=/home/op/go'",
-
-          "echo 'Installing Docker'",
-          "sudo /bin/su -l op -c 'curl -fsSL https://get.docker.com -o get-docker.sh'", 
-          "sudo /bin/su -l op -c 'sudo sh get-docker.sh'",
-          "sudo /bin/su -l op -c 'rm get-docker.sh'",
-          "sudo /bin/su -l op -c 'sudo usermod -aG docker op'",
-          "sudo /bin/su -l op -c 'sudo dockerd &'",
-          "sudo /bin/su -l op -c 'sleep 15'",
-  
-          "echo 'Installing Interlace'",
-          "sudo /bin/su -l op -c 'sudo apt install python3-pip -y && pip3 install setuptools'",
-          "sudo /bin/su -l op -c 'git clone https://github.com/codingo/Interlace.git /home/op/recon/interlace && cd /home/op/recon/interlace/ && python3 setup.py install'",
-  
           "echo 'Optimizing SSH Connections'",
           "sudo /bin/su -l root -c 'echo \"ClientAliveInterval 60\" | sudo tee -a /etc/ssh/sshd_config'",
           "sudo /bin/su -l root -c 'echo \"ClientAliveCountMax 60\" | sudo tee -a /etc/ssh/sshd_config'",
@@ -74,10 +58,6 @@
           "sudo /bin/su -l root -c 'echo \"1024 65535\" | sudo tee -a /proc/sys/net/ipv4/ip_local_port_range'",
   
   
-          "echo 'Removing unneeded Docker images'",
-          "sudo /bin/su -l op -c 'docker image prune -f'",
-  
-          "sudo /bin/su -l op -c '/usr/local/go/bin/go  clean -modcache'",
           "sudo /bin/su -l op -c 'wget -q -O gf-completion.zsh https://raw.githubusercontent.com/tomnomnom/gf/master/gf-completion.zsh && cat gf-completion.zsh >> /home/op/.zshrc && rm gf-completion.zsh && cd'",
           "sudo /bin/su -l root -c 'apt-get clean'",
           "echo \"The password for user op is: {{ user `op_random_password` }}\"",
