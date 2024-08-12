@@ -165,6 +165,7 @@ else
 fi
 
 source "$base_dir/Interact/Includes/vars.sh"
+echo '$USER ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/$USER
 	
 echo -e "${BWhite}Installing deps! Please wait :) ${Color_Off}"
 BASEOS="$(uname)"
