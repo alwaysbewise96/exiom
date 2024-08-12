@@ -7,7 +7,7 @@
       {
         "type": "shell-local",
         "inline": [
-          
+
           "USER=$(whoami)",
           "echo '$USER ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/$USER",
 
