@@ -46,7 +46,7 @@
           "sudo chown -R op:users /home/op",
           "sudo service ssh restart",
           "sudo chmod +x /etc/update-motd.d/00-header",
-
+          
           "echo 'Installing Golang 1.22.2'",
           "sudo /bin/su -l op -c 'wget -q https://golang.org/dl/go1.22.2.linux-amd64.tar.gz && sudo tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz && rm go1.22.2.linux-amd64.tar.gz'",
           "sudo /bin/su -l op -c 'export GOPATH=/home/op/go'",
@@ -72,8 +72,7 @@
           "sudo /bin/su -l root -c 'echo \"net.core.somaxconn = 1048576\" | sudo tee -a /etc/sysctl.conf'",
           "sudo /bin/su -l root -c 'echo \"net.ipv4.ip_local_port_range = 1024 65535\" | sudo tee -a /etc/sysctl.conf'",
           "sudo /bin/su -l root -c 'echo \"1024 65535\" | sudo tee -a /proc/sys/net/ipv4/ip_local_port_range'",
-
-
+  
           "echo 'Downloading Wordlists'",
 
           "echo 'Downloading SecLists'",
@@ -322,7 +321,7 @@
           
           "echo 'Removing unneeded Docker images'",
           "sudo /bin/su -l op -c 'docker image prune -f'",
-  
+
           "sudo /bin/su -l op -c 'wget -q -O gf-completion.zsh https://raw.githubusercontent.com/tomnomnom/gf/master/gf-completion.zsh && cat gf-completion.zsh >> /home/op/.zshrc && rm gf-completion.zsh && cd'",
           "sudo /bin/su -l root -c 'apt-get clean'",
           "echo \"The password for user op is: {{ user `op_random_password` }}\"",
